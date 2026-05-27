@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Despachos Despachp-SM</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #f5f5f5; --card: #ffffff; --border: #e0e0e0;
+    --text: #1a1a1a; --text2: #666; --info-bg: #e8f0fe; --info: #1a73e8;
+    --green: #3B6D11; --green-bg: #EAF3DE;
+    --orange: #854F0B; --orange-bg: #FAEEDA;
+    --red: #993C1D; --red-bg: #FAECE7;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; }
+  .app { max-width: 480px; margin: 0 auto; padding: 1rem; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .header h2 { font-size: 17px; font-weight: 600; }
+  .back-btn { background: none; border: none; cursor: pointer; color: var(--text2); font-size: 22px; display: flex; align-items: center; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 12px; }
+  .badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .badge-pending { background: var(--orange-bg); color: var(--orange); }
+  .badge-done { background: var(--green-bg); color: var(--green); }
+  .badge-partial { background: var(--red-bg); color: var(--red); }
+  .zone-tag { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--info-bg); color: var(--info); }
+  .btn { width: 100%; padding: 11px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; cursor: pointer; color: var(--text); margin-top: 8px; font-weight: 500; }
+  .btn:hover { background: var(--bg); }
+  .btn-blue { background: var(--info); color: white; border-color: var(--info); }
+  .btn-blue:hover { background: #1557b0; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem; text-align: center; }
+  .stat-num { font-size: 24px; font-weight: 700; }
+  .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .nav-tabs { display: flex; gap: 6px; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 4px; }
+  .nav-tab { flex-shrink: 0; padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; color: var(--text2); background: var(--card); font-weight: 500; }
+  .nav-tab.active { border-color: var(--info); color: var(--info); background: var(--info-bg); }
+  .progress-bar { height: 6px; background: var(--bg); border-radius: 4px; margin-top: 8px; }
+  .progress-fill { height: 6px; background: var(--green); border-radius: 4px; transition: width 0.3s; }
+  .photo-box { border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 1.5rem; text-align: center; color: var(--text2); font-size: 13px; margin: 8px 0; cursor: pointer; }
+  .photo-box:hover { border-color: var(--info); color: var(--info); }
+  label { font-size: 13px; color: var(--text2); display: block; margin-top: 10px; margin-bottom: 4px; }
+  input[type=text], input[type=password], select, textarea {
+    width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 14px; background: var(--card);
+    color: var(--text); outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--info); }
+  .check-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .check-item:last-child { border-bottom: none; }
+  .pending-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .pending-item:last-child { border-bottom: none; }
+  .arrival-chip { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+  .arrival-today { background: var(--red-bg); color: var(--red); }
+  .arrival-soon { background: var(--orange-bg); color: var(--orange); }
+  .arrival-ok { background: var(--green-bg); color: var(--green); }
+  .zone-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; margin: 4px; }
+  .zone-chip button { background: none; border: none; cursor: pointer; color: var(--text2); font-size: 15px; }
+  .loading { text-align: center; padding: 2rem; color: var(--text2); }
+  .role-btn { display: flex; align-items: center; gap: 12px; padding: 1rem; background: var(--card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; margin-bottom: 10px; transition: border-color 0.2s; }
+  .role-btn:hover { border-color: var(--info); }
+  .role-icon { font-size: 28px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- LOGIN -->
+<div id="s-login" class="screen active">
+  <div style="text-align:center; padding: 2rem 0 1.5rem;">
+    <div style="font-size:48px;">🚚</div>
+    <h1 style="font-size:22px; font-weight:700; margin-top:8px;">Despachp-SM</h1>
+    <p style="color:var(--text2); font-size:14px; margin-top:4px;">Sistema de despachos</p>
+  </div>
+  <div class="card">
+    <p style="font-size:14px; font-weight:600; margin-bottom:12px;">¿Cómo ingresas?</p>
+    <div class="role-btn" onclick="enterAs('repartidor')">
+      <span class="role-icon">🛵</span>
+      <div><p style="font-weight:600; font-size:14px;">Soy repartidor</p><p style="font-size:12px; color:var(--text2);">Ver pedidos y actualizar estado</p></div>
+    </div>
+    <div class="role-btn" onclick="showAdminLogin()">
+      <span class="role-icon">🔑</span>
+      <div><p style="font-weight:600; font-size:14px;">Soy encargado</p><p style="font-size:12px; color:var(--text2);">Gestión completa de pedidos</p></div>
+    </div>
+    <div id="admin-form" style="display:none; margin-top:12px;">
+      <label>Contraseña encargado</label>
+      <input type="password" id="admin-pass" placeholder="Ingresa contraseña">
+      <button class="btn btn-blue" style="margin-top:8px;" onclick="adminLogin()">Ingresar como encargado</button>
+      <p id="login-error" style="color:var(--red); font-size:12px; margin-top:6px; display:none;">Contraseña incorrecta</p>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="s-home" class="screen">
+  <div class="header">
+    <div style="flex:1">
+      <h2><i class="ti ti-truck"></i> Despachos del día</h2>
+      <p id="role-label" style="font-size:12px; color:var(--text2); margin-top:2px;"></p>
+    </div>
+    <button class="back-btn" onclick="logout()" title="Salir"><i class="ti ti-logout"></i></button>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:1rem;">
+    <div class="stat"><div class="stat-num" id="total-count">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat"><div class="stat-num" id="done-count" style="color:var(--green)">0</div><div class="stat-lbl">Entregados</div></div>
+    <div class="stat"><div class="stat-num" id="pend-count" style="color:var(--orange)">0</div><div class="stat-lbl">Pendientes</div></div>
+    <div class="stat"><div class="stat-num" id="part-count" style="color:var(--red)">0</div><div class="stat-lbl">Incompletos</div></div>
+  </div>
+  <div class="nav-tabs" id="zone-tabs"></div>
+  <div id="orders-list"><div class="loading"><i class="ti ti-loader ti-spin"></i> Cargando pedidos...</div></div>
+  <div id="admin-actions" style="display:none;">
+    <button class="btn" onclick="goTo('s-add')"><i class="ti ti-plus"></i> Agregar pedido</button>
+    <button class="btn" onclick="goTo('s-config')"><i class="ti ti-settings"></i> Configurar zonas</button>
+  </div>
+</div>
+
+<!-- DETALLE -->
+<div id="s-detail" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('s-home')"><i class="ti ti-arrow-left"></i></button>
+    <h2 id="detail-title">Detalle pedido</h2>
+  </div>
+  <div class="card" id="detail-info"></div>
+  <div class="card" id="pending-section" style="display:none;">
+    <p style="font-size:13px; font-weight:600; margin-bottom:8px;"><i class="ti ti-clock-exclamation"></i> Pendiente de llegada a bodega</p>
+    <div id="pending-list"></div>
+  </div>
+  <div class="card">
+    <p style="font-size:13px; font-weight:600; margin-bottom:10px;"><i class="ti ti-package"></i> Checklist de entrega</p>
+    <div id="items-list"></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <p style="font-size:11px; color:var(--text2); margin-top:4px;" id="progress-text"></p>
+  </div>
+  <div class="card">
+    <p style="font-size:13px; font-weight:600; margin-bottom:8px;"><i class="ti ti-camera"></i> Guía firmada</p>
+    <div class="photo-box" id="photo-box" onclick="document.getElementById('photo-input').click()">
+      <i class="ti ti-upload" style="font-size:28px; display:block; margin-bottom:6px;"></i>
+      Toca para adjuntar foto de la guía firmada
+    </div>
+    <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
+    <img id="photo-preview" style="width:100%; border-radius:8px; margin-top:8px; display:none;" alt="Guía firmada">
+    <p id="photo-status" style="font-size:12px; color:var(--text2); margin-top:4px;"></p>
+  </div>
+  <button class="btn btn-blue" onclick="markDone()"><i class="ti ti-check"></i> Marcar como entregado</button>
+</div>
+
+<!-- AGREGAR PEDIDO (solo encargado) -->
+<div id="s-add" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('s-home')"><i class="ti ti-arrow-left"></i></button>
+    <h2>Nuevo pedido</h2>
+  </div>
+  <div class="card">
+    <label>Cliente</label>
+    <input type="text" id="new-client" placeholder="Nombre del cliente">
+    <label>Dirección</label>
+    <input type="text" id="new-addr" placeholder="Av. Ejemplo 123">
+    <label>Zona / Comuna</label>
+    <select id="new-zone"></select>
+    <label>Productos disponibles para despachar (uno por línea)</label>
+    <textarea id="new-items-avail" rows="3" placeholder="Cemento 25kg&#10;Pintura blanca 1GL"></textarea>
+    <label>Productos pendientes de bodega — formato: Nombre | DD/MM/AAAA</label>
+    <textarea id="new-items-pend" rows="2" placeholder="Flejes metálicos x50 | 28/05/2026&#10;Sellador multiuso | 30/05/2026"></textarea>
+    <p style="font-size:11px; color:var(--text2); margin-top:4px;"><i class="ti ti-info-circle"></i> Ingresa nombre y fecha estimada de llegada a bodega</p>
+    <button class="btn btn-blue" onclick="addOrder()"><i class="ti ti-plus"></i> Agregar pedido</button>
+  </div>
+</div>
+
+<!-- CONFIGURAR ZONAS -->
+<div id="s-config" class="screen">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('s-home')"><i class="ti ti-arrow-left"></i></button>
+    <h2>Zonas de trabajo</h2>
+  </div>
+  <div class="card">
+    <p style="font-size:13px; color:var(--text2); margin-bottom:10px;">Zonas activas:</p>
+    <div id="zone-chips"></div>
+    <div style="display:flex; gap:8px; margin-top:12px;">
+      <input type="text" id="new-zone-input" placeholder="Nueva zona o comuna..." style="flex:1;">
+      <button class="btn" style="width:auto; margin:0; padding:9px 16px;" onclick="addZone()"><i class="ti ti-plus"></i></button>
+    </div>
+  </div>
+  <button class="btn btn-blue" onclick="saveZonesAndBack()"><i class="ti ti-check"></i> Guardar zonas</button>
+</div>
+
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQ6CEB3wv441KD4_WiXXsz71e9HBP8SKk",
+    authDomain: "despachp-sm.firebaseapp.com",
+    projectId: "despachp-sm",
+    storageBucket: "despachp-sm.firebasestorage.app",
+    messagingSenderId: "113145377183",
+    appId: "1:113145377183:web:ec286e0d11257528210daa"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const ADMIN_PASSWORD = "despacho2024";
+  let role = null;
+  let currentZone = 'all';
+  let currentOrder = null;
+  let allOrders = [];
+  let zones = [];
+  let unsubOrders = null;
+
+  // ---- AUTH ----
+  window.showAdminLogin = () => {
+    document.getElementById('admin-form').style.display = 'block';
+  };
+  window.adminLogin = () => {
+    const pass = document.getElementById('admin-pass').value;
+    if(pass === ADMIN_PASSWORD) { enterAs('admin'); }
+    else { document.getElementById('login-error').style.display = 'block'; }
+  };
+  window.enterAs = (r) => {
+    role = r;
+    document.getElementById('role-label').textContent = r === 'admin' ? '👤 Encargado' : '🛵 Repartidor';
+    document.getElementById('admin-actions').style.display = r === 'admin' ? 'block' : 'none';
+    goTo('s-home');
+    loadZones();
+    startListening();
+  };
+  window.logout = () => {
+    if(unsubOrders) unsubOrders();
+    role = null; goTo('s-login');
+  };
+
+  // ---- ZONES ----
+  async function loadZones() {
+    const ref = doc(db, 'config', 'zones');
+    const snap = await getDoc(ref);
+    zones = snap.exists() ? snap.data().list : ['Providencia','Maipú','Las Condes','Ñuñoa'];
+    renderZoneTabs();
+    renderZoneSelect();
+    renderZoneChips();
+  }
+  async function saveZones() {
+    await setDoc(doc(db, 'config', 'zones'), { list: zones });
+  }
+  window.addZone = () => {
+    const v = document.getElementById('new-zone-input').value.trim();
+    if(v && !zones.includes(v)) { zones.push(v); renderZoneChips(); renderZoneSelect(); }
+    document.getElementById('new-zone-input').value = '';
+  };
+  window.removeZone = (i) => { zones.splice(i,1); renderZoneChips(); };
+  window.saveZonesAndBack = async () => { await saveZones(); goTo('s-home'); renderZoneTabs(); };
+
+  function renderZoneTabs() {
+    const tabs = document.getElementById('zone-tabs');
+    tabs.innerHTML = `<div class="nav-tab ${currentZone==='all'?'active':''}" onclick="filterZone('all',this)">Todos</div>`
+      + zones.map(z => `<div class="nav-tab ${currentZone===z?'active':''}" onclick="filterZone('${z}',this)">${z}</div>`).join('');
+  }
+  function renderZoneSelect() {
+    document.getElementById('new-zone').innerHTML = zones.map(z=>`<option>${z}</option>`).join('');
+  }
+  function renderZoneChips() {
+    document.getElementById('zone-chips').innerHTML = zones.map((z,i)=>`
+      <span class="zone-chip">${z}<button onclick="removeZone(${i})"><i class="ti ti-x"></i></button></span>`).join('');
+  }
+
+  // ---- ORDERS ----
+  function startListening() {
+    if(unsubOrders) unsubOrders();
+    unsubOrders = onSnapshot(collection(db, 'orders'), snap => {
+      allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      renderOrders();
+    });
+  }
+
+  function statusLabel(s){ return {done:'Entregado',pending:'Pendiente',partial:'Incompleto'}[s]||s; }
+  function statusBadge(s){ return {done:'badge-done',pending:'badge-pending',partial:'badge-partial'}[s]||''; }
+
+  function parseDate(str) {
+    const [d,m,y] = str.split('/');
+    return new Date(+y,+m-1,+d);
+  }
+  function arrivalClass(str) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.round((parseDate(str)-today)/(86400000));
+    return diff<=0?'arrival-today':diff<=3?'arrival-soon':'arrival-ok';
+  }
+  function arrivalLabel(str) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.round((parseDate(str)-today)/(86400000));
+    return diff<=0?'Llega hoy':diff===1?'Mañana':diff<=3?`En ${diff} días`:str;
+  }
+
+  function renderOrders() {
+    const list = document.getElementById('orders-list');
+    const filtered = currentZone==='all' ? allOrders : allOrders.filter(o=>o.zone===currentZone);
+    if(!filtered.length){ list.innerHTML='<div class="loading">Sin pedidos en esta zona</div>'; updateStats(); return; }
+    list.innerHTML = filtered.map(o => {
+      const pend = o.pendingItems||[];
+      const pendHtml = pend.length ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+        <p style="font-size:11px;color:var(--text2);margin-bottom:4px;"><i class="ti ti-clock-exclamation"></i> Pendiente de bodega:</p>
+        ${pend.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+          <span style="font-size:12px;">${p.name}</span>
+          <span class="arrival-chip ${arrivalClass(p.arrival)}">${arrivalLabel(p.arrival)}</span>
+        </div>`).join('')}
+      </div>` : '';
+      return `<div class="card" onclick="openOrder('${o.id}')" style="cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div><p style="font-size:14px;font-weight:600;">${o.client}</p>
+          <p style="font-size:12px;color:var(--text2);margin-top:2px;"><i class="ti ti-map-pin"></i> ${o.addr}</p></div>
+          <span class="badge ${statusBadge(o.status)}">${statusLabel(o.status)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="zone-tag"><i class="ti ti-building"></i> ${o.zone}</span>
+          <span style="font-size:12px;color:var(--text2);">${(o.items||[]).filter(i=>i.done).length}/${(o.items||[]).length} items ${o.photo?'📷':''}</span>
+        </div>${pendHtml}
+      </div>`;
+    }).join('');
+    updateStats();
+  }
+
+  function updateStats() {
+    document.getElementById('total-count').textContent = allOrders.length;
+    document.getElementById('done-count').textContent = allOrders.filter(o=>o.status==='done').length;
+    document.getElementById('pend-count').textContent = allOrders.filter(o=>o.status==='pending').length;
+    document.getElementById('part-count').textContent = allOrders.filter(o=>o.status==='partial').length;
+  }
+
+  window.filterZone = (z, el) => {
+    currentZone = z;
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    renderOrders();
+  };
+
+  window.openOrder = (id) => {
+    currentOrder = allOrders.find(o=>o.id===id);
+    if(!currentOrder) return;
+    document.getElementById('detail-title').textContent = currentOrder.client;
+    const items = currentOrder.items||[];
+    const doneCount = items.filter(i=>i.done).length;
+    const pct = items.length ? Math.round(doneCount/items.length*100) : 0;
+    document.getElementById('detail-info').innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="badge ${statusBadge(currentOrder.status)}">${statusLabel(currentOrder.status)}</span>
+        <span class="zone-tag">${currentOrder.zone}</span>
+      </div>
+      <p style="font-size:13px;color:var(--text2);"><i class="ti ti-map-pin"></i> ${currentOrder.addr}</p>`;
+    const pend = currentOrder.pendingItems||[];
+    const ps = document.getElementById('pending-section');
+    if(pend.length){
+      ps.style.display='block';
+      document.getElementById('pending-list').innerHTML = pend.map(p=>`
+        <div class="pending-item">
+          <span>${p.name}</span>
+          <span class="arrival-chip ${arrivalClass(p.arrival)}">${arrivalLabel(p.arrival)}</span>
+        </div>`).join('');
+    } else { ps.style.display='none'; }
+    document.getElementById('items-list').innerHTML = items.map((item,idx)=>`
+      <div class="check-item">
+        <input type="checkbox" id="ci-${idx}" ${item.done?'checked':''} onchange="toggleItem(${idx})">
+        <label for="ci-${idx}" style="color:${item.done?'var(--text2)':'var(--text)'};text-decoration:${item.done?'line-through':'none'}">${item.name}</label>
+      </div>`).join('');
+    document.getElementById('progress-fill').style.width = pct+'%';
+    document.getElementById('progress-text').textContent = `${doneCount} de ${items.length} productos entregados`;
+    const box = document.getElementById('photo-box');
+    const prev = document.getElementById('photo-preview');
+    const st = document.getElementById('photo-status');
+    if(currentOrder.photo){
+      prev.src = currentOrder.photo; prev.style.display='block';
+      box.style.display='none'; st.textContent='Guía adjunta ✓';
+    } else {
+      prev.style.display='none'; box.style.display='block'; st.textContent='';
+      box.innerHTML='<i class="ti ti-upload" style="font-size:28px;display:block;margin-bottom:6px;"></i>Toca para adjuntar foto de la guía firmada';
+    }
+    goTo('s-detail');
+  };
+
+  window.toggleItem = async (idx) => {
+    currentOrder.items[idx].done = !currentOrder.items[idx].done;
+    const done = currentOrder.items.filter(i=>i.done).length;
+    const total = currentOrder.items.length;
+    currentOrder.status = done===total?'done':done>0?'partial':'pending';
+    document.getElementById('progress-fill').style.width = Math.round(done/total*100)+'%';
+    document.getElementById('progress-text').textContent = `${done} de ${total} productos entregados`;
+    document.querySelectorAll('.check-item label').forEach((l,i)=>{
+      l.style.color = currentOrder.items[i].done?'var(--text2)':'var(--text)';
+      l.style.textDecoration = currentOrder.items[i].done?'line-through':'none';
+    });
+    await updateDoc(doc(db,'orders',currentOrder.id),{ items: currentOrder.items, status: currentOrder.status });
+  };
+
+  window.handlePhoto = (e) => {
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      currentOrder.photo = ev.target.result;
+      document.getElementById('photo-preview').src = ev.target.result;
+      document.getElementById('photo-preview').style.display='block';
+      document.getElementById('photo-box').style.display='none';
+      document.getElementById('photo-status').textContent='Guía adjunta ✓';
+      await updateDoc(doc(db,'orders',currentOrder.id),{ photo: ev.target.result });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.markDone = async () => {
+    currentOrder.items.forEach(i=>i.done=true);
+    currentOrder.status='done';
+    await updateDoc(doc(db,'orders',currentOrder.id),{ items: currentOrder.items, status:'done' });
+    goTo('s-home');
+  };
+
+  window.addOrder = async () => {
+    const client = document.getElementById('new-client').value.trim();
+    const addr = document.getElementById('new-addr').value.trim();
+    const zone = document.getElementById('new-zone').value;
+    const avail = document.getElementById('new-items-avail').value.trim().split('\n').filter(i=>i).map(n=>({name:n.trim(),done:false}));
+    const pendLines = document.getElementById('new-items-pend').value.trim().split('\n').filter(i=>i);
+    const pend = pendLines.map(l=>{ const p=l.split('|'); return {name:p[0].trim(),arrival:p[1]?p[1].trim():'?'}; });
+    if(!client||!addr) { alert('Completa cliente y dirección'); return; }
+    await addDoc(collection(db,'orders'),{ client, addr, zone, items: avail, pendingItems: pend, status:'pending', photo:null, createdAt: new Date().toISOString() });
+    document.getElementById('new-client').value='';
+    document.getElementById('new-addr').value='';
+    document.getElementById('new-items-avail').value='';
+    document.getElementById('new-items-pend').value='';
+    goTo('s-home');
+  };
+
+  window.goTo = (id) => {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id==='s-config') renderZoneChips();
+    if(id==='s-add') renderZoneSelect();
+  };
+</script>
+</body>
+</html>
